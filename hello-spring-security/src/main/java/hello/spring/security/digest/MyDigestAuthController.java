@@ -9,16 +9,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("/digest")
 public class MyDigestAuthController {
-	
+
 	private static final Logger log = Logger.getLogger(MyDigestAuthController.class);
 
 	@PreAuthorize("hasRole('ROLE_DIGEST_USER')")
 	@RequestMapping("/auth")
-	public String auth(Authentication authentication, Principal principal) {
+	public @ResponseBody String auth(Authentication authentication, Principal principal) {
 		try {
 			log.debug("---> auth");
 			log.debug("authentication=" + authentication);
@@ -33,5 +34,5 @@ public class MyDigestAuthController {
 		}
 
 	}
-	
+
 }

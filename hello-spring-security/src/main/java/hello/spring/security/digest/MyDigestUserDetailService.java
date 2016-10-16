@@ -3,6 +3,8 @@ package hello.spring.security.digest;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,6 +18,11 @@ import org.springframework.stereotype.Service;
 public class MyDigestUserDetailService implements UserDetailsService {
 
 	private static Logger log = Logger.getLogger(MyDigestUserDetailService.class);
+
+	@PostConstruct
+	public void postConstruct() {
+		log.debug("postConstruct");
+	}
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

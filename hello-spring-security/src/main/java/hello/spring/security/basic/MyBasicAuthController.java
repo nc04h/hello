@@ -8,17 +8,18 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 @Controller
 @RequestMapping("/basic")
 public class MyBasicAuthController {
-	
+
 	private static final Logger log = Logger.getLogger(MyBasicAuthController.class);
 
 	@PreAuthorize("hasRole('ROLE_BASIC_USER')")
 	@RequestMapping("/auth")
-	public String auth(Authentication authentication, Principal principal) {
+	public @ResponseBody String auth(Authentication authentication, Principal principal) {
 		try {
 			log.debug("---> auth");
 			log.debug("authentication=" + authentication);

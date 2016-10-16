@@ -22,6 +22,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint;
@@ -37,8 +38,6 @@ import hello.spring.security.digest.MyDigestUserDetailService;
 public class SecurityConfig {
 
 	private static final Logger log = Logger.getLogger(SecurityConfig.class);
-
-
 
 	@Configuration
 	@Order(2)
@@ -70,21 +69,7 @@ public class SecurityConfig {
 			http
 			.antMatcher("/basic/**")
 			.authenticationProvider(basicAuth)
-//			.exceptionHandling()
-//			.authenticationEntryPoint(basicAuthenticationEntryPoint())
-//			.and()
-			.addFilter(basicAuthenticationFilter())
-
-
-			//.antMatcher("/basic/**")
-			//			.addFilter(basicAuthenticationFilter())
-			//			.addFilterAfter(basicAuthenticationFilter(), DigestAuthenticationFilter.class)
-			//			.addFilterAfter(new MyFilter(), DigestAuthenticationFilter.class)
-			//			.authenticationProvider(basicAuth)
-			//			.httpBasic()
-			//			.and()
-			//.authorizeRequests().anyRequest().authenticated()
-			;
+			.addFilter(basicAuthenticationFilter());
 		}		
 	}
 
@@ -92,23 +77,14 @@ public class SecurityConfig {
 	@Order(1)
 	public static class DigestAuthenticationConfig extends WebSecurityConfigurerAdapter {
 
-		//		@Autowired 
-		//		private MyDigestUserDetailService digestUserDetailService;
-
 		@Autowired
-		private MyDigestAuthenticationProvider digestAuth;
+		private MyDigestUserDetailService userDetailService;
 
 		@Bean
-		public DigestAuthenticationFilter digestAuthenticationFilter() {
+		public DigestAuthenticationFilter digestAuthenticationFilter() throws Exception {
 			DigestAuthenticationFilter filter = new DigestAuthenticationFilter();
 			filter.setAuthenticationEntryPoint(digestAuthenticationEntryPoint());
-			filter.setUserDetailsService(new MyDigestUserDetailService());
-			return filter;
-		}
-
-		@Bean
-		public MyFilter myFilter() {
-			MyFilter filter = new MyFilter();
+			filter.setUserDetailsService(userDetailService);
 			return filter;
 		}
 
@@ -121,48 +97,11 @@ public class SecurityConfig {
 		}
 
 		@Override
-		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-			auth.authenticationProvider(digestAuth);
-		}
-		
-		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 			http
 			.antMatcher("/digest/**")
-//			.exceptionHandling()
-//			.authenticationEntryPoint(digestAuthenticationEntryPoint())
-//			.and()
-			//.addFilter(new BasicAuthenticationFilter(authenticationManager()))
-			//.addFilterAfter(digestAuthenticationFilter(), BasicAuthenticationFilter.class)
 			.addFilter(digestAuthenticationFilter())
-			//			.addFilterBefore(digestAuthenticationFilter(), BasicAuthenticationFilter.class)
-			//			.addFilterBefore(myFilter(), DigestAuthenticationFilter.class)
-			.authenticationProvider(digestAuth)
-
-			//			.httpBasic()
-			//			.and()
-			//			.authorizeRequests().anyRequest().authenticated()
-			;
+			.exceptionHandling().authenticationEntryPoint(digestAuthenticationEntryPoint());
 		}		
-	}
-
-	public static class MyFilter extends GenericFilterBean {
-
-		@Override
-		public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
-				throws IOException, ServletException {
-
-			HttpServletRequest request = (HttpServletRequest) req;
-			HttpServletResponse response = (HttpServletResponse) res;
-
-			log.debug(request);
-			log.debug(request.getHeader("Authorization"));
-			log.debug(response);
-			log.debug(chain);
-
-
-			chain.doFilter(request, response);
-		}
-
 	}
 }
