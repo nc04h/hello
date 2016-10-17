@@ -47,12 +47,13 @@ public class MyBasicAuthenticationProvider implements AuthenticationProvider {
 						authorities.add(new SimpleGrantedAuthority(perm.getName()));
 					});
 				});
+				log.debug("authorities=" + authorities);
 				Authentication auth = new UsernamePasswordAuthenticationToken(user, password, authorities);
-				log.debug(authentication.isAuthenticated());
+				log.debug("isAuthenticated=" + authentication.isAuthenticated());
 				log.debug(auth);
 				return auth;
 			} else {
-				System.out.println("Bad credentials");
+				log.error("Bad credentials: login=" + login + ", password=" + password);
 				throw new BadCredentialsException("Bad credentials");
 			}
 		} finally {

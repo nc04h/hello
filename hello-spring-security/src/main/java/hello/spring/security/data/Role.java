@@ -28,7 +28,7 @@ public class Role implements Serializable {
 	@Column(name = "NAME", nullable = false, unique = true)
 	private String name;
 
-	@OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "role", fetch = FetchType.EAGER)
 	private Set<Permission> permissions;
 
 	@ManyToOne(fetch = FetchType.LAZY)

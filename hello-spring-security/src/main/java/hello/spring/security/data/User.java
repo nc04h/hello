@@ -28,7 +28,18 @@ public class User implements Serializable {
 	@Column(name = "PASSWORD", nullable = false)
 	private String password;
 
-	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+	@Column(name = "MD5_PASSWORD", nullable = false)
+	private String md5Password;
+
+	public String getMd5Password() {
+		return md5Password;
+	}
+
+	public void setMd5Password(String md5Password) {
+		this.md5Password = md5Password;
+	}
+
+	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
 	private Set<Role> roles;
 
 	public long getId() {
