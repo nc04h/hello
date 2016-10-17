@@ -30,6 +30,27 @@ public class Permission implements Serializable {
 	@JoinTable(name = "ROLE_PERMISSIONS", joinColumns = @JoinColumn(name = "ID_PERMISSION"), inverseJoinColumns = @JoinColumn(name = "ID_ROLE"))
 	private Role role;
 
+	public long getId() {
+		return id;
+	}
 
+	public String getName() {
+		return name;
+	}
 
+	public Role getRole() {
+		return role;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
+	}
 }

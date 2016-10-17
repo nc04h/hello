@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.www.DigestAuthenticationE
 import org.springframework.security.web.authentication.www.DigestAuthenticationFilter;
 
 import hello.spring.security.basic.MyBasicAuthenticationProvider;
-import hello.spring.security.digest.MyDigestUserDetailService;
+import hello.spring.security.digest.MyDigestUserDetailsService;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -63,13 +63,21 @@ public class SecurityConfig {
 	public static class DigestAuthenticationConfig extends WebSecurityConfigurerAdapter {
 
 		@Autowired
-		private MyDigestUserDetailService userDetailService;
+		private MyDigestUserDetailsService userDetailsService;
+		@Autowired
+		private MyBasicAuthenticationProvider basicAuth;
+
+		@Override
+		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+			auth.authenticationProvider(basicAuth);
+			auth.userDetailsService(userDetailsService);
+		}
 
 		@Bean
 		public DigestAuthenticationFilter digestAuthenticationFilter() throws Exception {
 			DigestAuthenticationFilter filter = new DigestAuthenticationFilter();
 			filter.setAuthenticationEntryPoint(digestAuthenticationEntryPoint());
-			filter.setUserDetailsService(userDetailService);
+			filter.setUserDetailsService(userDetailsService);
 			return filter;
 		}
 

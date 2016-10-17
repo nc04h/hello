@@ -34,4 +34,36 @@ public class Role implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinTable(name = "USER_ROLES", joinColumns = @JoinColumn(name = "ID_ROLE"), inverseJoinColumns = @JoinColumn(name = "ID_USER"))
 	private User user;
+
+	public long getId() {
+		return id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public Set<Permission> getPermissions() {
+		return permissions;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setPermissions(Set<Permission> permissions) {
+		this.permissions = permissions;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
 }

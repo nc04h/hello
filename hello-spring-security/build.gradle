@@ -16,5 +16,5 @@ dependencies {
 	compile("org.postgresql:postgresql:9.4.1211")
 	compile("org.jasypt:jasypt:1.9.2")
 	compile("org.apache.httpcomponents:httpclient:4.5.2")
-
+	compile("org.apache.commons:commons-lang3:3.4")
 }

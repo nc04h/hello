@@ -30,4 +30,36 @@ public class User implements Serializable {
 
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
 	private Set<Role> roles;
+
+	public long getId() {
+		return id;
+	}
+
+	public String getLogin() {
+		return login;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public Set<Role> getRoles() {
+		return roles;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public void setLogin(String login) {
+		this.login = login;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public void setRoles(Set<Role> roles) {
+		this.roles = roles;
+	}
 }

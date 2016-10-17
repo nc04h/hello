@@ -8,4 +8,5 @@ import hello.spring.security.data.User;
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
 
+	public User findByLogin(String login);
 }
