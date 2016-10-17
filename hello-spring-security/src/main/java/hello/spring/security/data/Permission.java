@@ -25,7 +25,7 @@ public class Permission implements Serializable {
 
 	@Column(name = "NAME", nullable = false, unique = true)
 	private String name;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinTable(name = "ROLE_PERMISSIONS", joinColumns = @JoinColumn(name = "ID_PERMISSION"), inverseJoinColumns = @JoinColumn(name = "ID_ROLE"))
 	private Role role;
@@ -52,5 +52,27 @@ public class Permission implements Serializable {
 
 	public void setRole(Role role) {
 		this.role = role;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Permission other = (Permission) obj;
+		if (id != other.id)
+			return false;
+		return true;
 	}
 }

@@ -8,4 +8,5 @@ import hello.spring.security.data.Permission;
 @Repository
 public interface PermissionRepository extends CrudRepository<Permission, Long> {
 
+	public Permission findByName(String name);
 }

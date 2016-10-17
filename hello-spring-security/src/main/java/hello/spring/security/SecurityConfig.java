@@ -78,6 +78,7 @@ public class SecurityConfig {
 			DigestAuthenticationFilter filter = new DigestAuthenticationFilter();
 			filter.setAuthenticationEntryPoint(digestAuthenticationEntryPoint());
 			filter.setUserDetailsService(userDetailsService);
+			filter.setPasswordAlreadyEncoded(true);
 			return filter;
 		}
 
@@ -95,6 +96,7 @@ public class SecurityConfig {
 			.antMatcher("/digest/**")
 			.addFilter(digestAuthenticationFilter())
 			.exceptionHandling().authenticationEntryPoint(digestAuthenticationEntryPoint());
-		}		
+		}
+		
 	}
 }

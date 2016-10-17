@@ -28,7 +28,18 @@ public class User implements Serializable {
 	@Column(name = "PASSWORD", nullable = false)
 	private String password;
 
-	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+	@Column(name = "MD5_PASSWORD", nullable = false)
+	private String md5Password;
+
+	public String getMd5Password() {
+		return md5Password;
+	}
+
+	public void setMd5Password(String md5Password) {
+		this.md5Password = md5Password;
+	}
+
+	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
 	private Set<Role> roles;
 
 	public long getId() {
@@ -61,5 +72,27 @@ public class User implements Serializable {
 
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		User other = (User) obj;
+		if (id != other.id)
+			return false;
+		return true;
 	}
 }

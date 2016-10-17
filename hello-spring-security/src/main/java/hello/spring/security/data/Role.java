@@ -1,8 +1,10 @@
 package hello.spring.security.data;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -28,10 +30,10 @@ public class Role implements Serializable {
 	@Column(name = "NAME", nullable = false, unique = true)
 	private String name;
 
-	@OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
-	private Set<Permission> permissions;
+	@OneToMany(mappedBy = "role", fetch = FetchType.EAGER)
+	private Set<Permission> permissions = new HashSet<>();
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
 	@JoinTable(name = "USER_ROLES", joinColumns = @JoinColumn(name = "ID_ROLE"), inverseJoinColumns = @JoinColumn(name = "ID_USER"))
 	private User user;
 
@@ -65,5 +67,32 @@ public class Role implements Serializable {
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+	public void addPermission(Permission permission) {
+		getPermissions().add(permission);
+		permission.setRole(this);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Role other = (Role) obj;
+		if (id != other.id)
+			return false;
+		return true;
 	}
 }
