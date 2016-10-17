@@ -10,11 +10,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
+@EnableJpaRepositories(basePackages={"hello.spring.security.repo"})
+@EnableTransactionManagement
 public class PersistenceConfig {
 
 	@Value("${jdbc.driverClassName}")
@@ -42,7 +48,7 @@ public class PersistenceConfig {
 	private String pass;
 
 	@Bean
-	public DataSource getDataSource() {
+	public DataSource dataSource() {
 		StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
 		encryptor.setPassword(pass);
 		DriverManagerDataSource ds = new DriverManagerDataSource();
@@ -64,7 +70,7 @@ public class PersistenceConfig {
 	@Bean
 	public LocalSessionFactoryBean getSessionFactory() {
 		LocalSessionFactoryBean sessionFactoryBean = new LocalSessionFactoryBean();
-		sessionFactoryBean.setDataSource(getDataSource());
+		sessionFactoryBean.setDataSource(dataSource());
 		sessionFactoryBean.setHibernateProperties(hibernateProperties());
 		sessionFactoryBean.setPackagesToScan(new String[] { "hello.spring.security" });
 		return sessionFactoryBean;
@@ -77,5 +83,17 @@ public class PersistenceConfig {
 		properties.put("hibernate.show_sql", hibernateShowSql);
 		properties.put("hibernate.hbm2ddl.auto", hibernateHbm2ddlAuto);
 		return properties;
+	}
+
+	@Bean
+	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+		LocalContainerEntityManagerFactoryBean entityManagerFactory = new LocalContainerEntityManagerFactoryBean();
+		entityManagerFactory.setDataSource(dataSource());
+		entityManagerFactory.setPackagesToScan(new String[] { "hello.spring.security" });
+		entityManagerFactory.setJpaProperties(hibernateProperties());
+		HibernateJpaVendorAdapter adapter = new HibernateJpaVendorAdapter();
+		adapter.setGenerateDdl(false);
+		entityManagerFactory.setJpaVendorAdapter(adapter);
+		return entityManagerFactory;
 	}
 }
