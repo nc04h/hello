@@ -8,8 +8,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -27,7 +25,6 @@ public class Permission implements Serializable {
 	private String name;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinTable(name = "ROLE_PERMISSIONS", joinColumns = @JoinColumn(name = "ID_PERMISSION"), inverseJoinColumns = @JoinColumn(name = "ID_ROLE"))
 	private Role role;
 
 	public long getId() {

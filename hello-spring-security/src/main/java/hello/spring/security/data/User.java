@@ -9,8 +9,13 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 @Entity
 @Table(name = "USERS")
@@ -31,15 +36,11 @@ public class User implements Serializable {
 	@Column(name = "MD5_PASSWORD", nullable = false)
 	private String md5Password;
 
-	public String getMd5Password() {
-		return md5Password;
-	}
-
-	public void setMd5Password(String md5Password) {
-		this.md5Password = md5Password;
-	}
-
-	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+	@OneToMany(fetch = FetchType.EAGER)
+	@Cascade(value = { CascadeType.SAVE_UPDATE })
+	@JoinTable(name = "USER_ROLES", 
+		joinColumns = @JoinColumn(name = "ID_USER", referencedColumnName = "ID"), 
+		inverseJoinColumns = @JoinColumn(name = "ID_ROLE", referencedColumnName = "ID"))
 	private Set<Role> roles;
 
 	public long getId() {
@@ -72,6 +73,14 @@ public class User implements Serializable {
 
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
+	}
+
+	public String getMd5Password() {
+		return md5Password;
+	}
+
+	public void setMd5Password(String md5Password) {
+		this.md5Password = md5Password;
 	}
 
 	@Override

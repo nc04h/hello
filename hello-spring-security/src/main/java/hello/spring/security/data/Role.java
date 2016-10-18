@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -16,6 +15,9 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 @Entity
 @Table(name = "ROLES")
@@ -30,11 +32,14 @@ public class Role implements Serializable {
 	@Column(name = "NAME", nullable = false, unique = true)
 	private String name;
 
-	@OneToMany(mappedBy = "role", fetch = FetchType.EAGER)
+	@OneToMany(fetch = FetchType.EAGER)
+	@Cascade(value = { CascadeType.SAVE_UPDATE })
+	@JoinTable(name = "ROLE_PERMISSIONS", 
+		joinColumns = @JoinColumn(name = "ID_ROLE", referencedColumnName = "ID"), 
+		inverseJoinColumns = @JoinColumn(name = "ID_PERMISSION", referencedColumnName = "ID"))
 	private Set<Permission> permissions = new HashSet<>();
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
-	@JoinTable(name = "USER_ROLES", joinColumns = @JoinColumn(name = "ID_ROLE"), inverseJoinColumns = @JoinColumn(name = "ID_USER"))
+	@ManyToOne(fetch = FetchType.LAZY)
 	private User user;
 
 	public long getId() {
