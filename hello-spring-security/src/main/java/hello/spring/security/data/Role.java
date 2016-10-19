@@ -32,7 +32,7 @@ public class Role implements Serializable {
 	@Column(name = "NAME", nullable = false, unique = true)
 	private String name;
 
-	@OneToMany(fetch = FetchType.EAGER)
+	@OneToMany(fetch = FetchType.LAZY)
 	@Cascade(value = { CascadeType.SAVE_UPDATE })
 	@JoinTable(name = "ROLE_PERMISSIONS", 
 		joinColumns = @JoinColumn(name = "ID_ROLE", referencedColumnName = "ID"), 
