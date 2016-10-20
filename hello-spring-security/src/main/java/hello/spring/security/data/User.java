@@ -36,7 +36,7 @@ public class User implements Serializable {
 	@Column(name = "MD5_PASSWORD", nullable = false)
 	private String md5Password;
 
-	@OneToMany(fetch = FetchType.EAGER)
+	@OneToMany(fetch = FetchType.LAZY)
 	@Cascade(value = { CascadeType.SAVE_UPDATE })
 	@JoinTable(name = "USER_ROLES", 
 		joinColumns = @JoinColumn(name = "ID_USER", referencedColumnName = "ID"), 

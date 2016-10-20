@@ -40,6 +40,9 @@ public class Role implements Serializable {
 	private Set<Permission> permissions = new HashSet<>();
 
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinTable(name = "USER_ROLES", 
+		joinColumns = @JoinColumn(name = "ID_ROLE", referencedColumnName = "ID"), 
+		inverseJoinColumns = @JoinColumn(name = "ID_USER", referencedColumnName = "ID"))
 	private User user;
 
 	public long getId() {
