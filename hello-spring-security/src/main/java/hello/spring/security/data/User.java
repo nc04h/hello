@@ -1,6 +1,7 @@
 package hello.spring.security.data;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -41,7 +42,7 @@ public class User implements Serializable {
 	@JoinTable(name = "USER_ROLES", 
 		joinColumns = @JoinColumn(name = "ID_USER", referencedColumnName = "ID"), 
 		inverseJoinColumns = @JoinColumn(name = "ID_ROLE", referencedColumnName = "ID"))
-	private Set<Role> roles;
+	private Set<Role> roles = new HashSet<>();
 
 	public long getId() {
 		return id;
