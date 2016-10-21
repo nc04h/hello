@@ -23,7 +23,6 @@ public class UserService {
 	public UserRepository getUserRepository() {
 		return userRepository;
 	}
-
 	public User findByLogin(String login) {
 		log.debug("findByLogin " + login);
 		User user = userRepository.findByLogin(login);
