@@ -103,4 +103,12 @@ public class Role implements Serializable {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Role [id=").append(id).append(", name=").append(name).append(", permissions=")
+		        .append(permissions).append("]");
+		return builder.toString();
+	}
 }

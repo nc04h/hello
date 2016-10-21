@@ -105,4 +105,12 @@ public class User implements Serializable {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("User [id=").append(id).append(", login=").append(login).append(", password=").append(password)
+		        .append(", md5Password=").append(md5Password).append(", roles=").append(roles).append("]");
+		return builder.toString();
+	}
 }

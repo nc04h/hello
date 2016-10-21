@@ -77,4 +77,12 @@ public class Permission implements Serializable {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Permission [id=").append(id).append(", name=").append(name)
+		        .append("]");
+		return builder.toString();
+	}
 }

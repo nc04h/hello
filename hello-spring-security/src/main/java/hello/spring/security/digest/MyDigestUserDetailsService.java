@@ -38,7 +38,7 @@ public class MyDigestUserDetailsService implements UserDetailsService {
 			if (StringUtils.isEmpty(username)) {
 				throw new UsernameNotFoundException("user is not found");
 			}
-			hello.spring.security.data.User user = userService.getUserRepository().findByLogin(username);
+			hello.spring.security.data.User user = userService.findByLogin(username);
 			if (user == null) {
 				throw new UsernameNotFoundException("user is not found");
 			}
@@ -48,7 +48,7 @@ public class MyDigestUserDetailsService implements UserDetailsService {
 					authorities.add(new SimpleGrantedAuthority(perm.getName()));
 				});
 			});
-			UserDetails userDetails = new User(user.getLogin(), user.getPassword(), authorities);
+			UserDetails userDetails = new User(user.getLogin(), user.getMd5Password(), authorities);
 			log.debug(userDetails);
 			return userDetails;
 		} finally {

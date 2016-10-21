@@ -64,12 +64,9 @@ public class SecurityConfig {
 
 		@Autowired
 		private MyDigestUserDetailsService userDetailsService;
-		@Autowired
-		private MyBasicAuthenticationProvider basicAuth;
 
 		@Override
 		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-			auth.authenticationProvider(basicAuth);
 			auth.userDetailsService(userDetailsService);
 		}
 
