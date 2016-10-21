@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.www.DigestAuthenticationE
 import org.springframework.security.web.authentication.www.DigestAuthenticationFilter;
 
 import hello.spring.security.basic.MyBasicAuthenticationProvider;
+import hello.spring.security.digest.MyDigestAuthenticationProvider;
 import hello.spring.security.digest.MyDigestUserDetailsService;
 
 @EnableWebSecurity
@@ -28,6 +29,8 @@ public class SecurityConfig {
 	@Order(2)
 	public static class BasicAuthenticationConfig extends WebSecurityConfigurerAdapter {
 
+		public static final String REALM_NAME = "Hello Basic Auth";
+
 		@Autowired
 		private MyBasicAuthenticationProvider basicAuth;
 
@@ -38,7 +41,7 @@ public class SecurityConfig {
 
 		public BasicAuthenticationEntryPoint basicAuthenticationEntryPoint() {
 			BasicAuthenticationEntryPoint entryPoint = new BasicAuthenticationEntryPoint();
-			entryPoint.setRealmName("Hello Basic Auth");
+			entryPoint.setRealmName(REALM_NAME);
 			return entryPoint;
 		}
 
@@ -62,15 +65,17 @@ public class SecurityConfig {
 	@Order(1)
 	public static class DigestAuthenticationConfig extends WebSecurityConfigurerAdapter {
 
+		public static final String REALM_NAME = "Hello Digest Auth";
+
 		@Autowired
 		private MyDigestUserDetailsService userDetailsService;
 		@Autowired
-		private MyBasicAuthenticationProvider basicAuth;
+		private MyDigestAuthenticationProvider digestAuth;
 
 		@Override
 		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-			auth.authenticationProvider(basicAuth);
 			auth.userDetailsService(userDetailsService);
+//			auth.authenticationProvider(digestAuth);
 		}
 
 		@Bean
@@ -84,7 +89,7 @@ public class SecurityConfig {
 
 		public DigestAuthenticationEntryPoint digestAuthenticationEntryPoint() {
 			DigestAuthenticationEntryPoint entryPoint = new DigestAuthenticationEntryPoint();
-			entryPoint.setRealmName("Hello Digest Auth");
+			entryPoint.setRealmName(REALM_NAME);
 			entryPoint.setNonceValiditySeconds(300);
 			entryPoint.setKey("acegi");
 			return entryPoint;
@@ -97,6 +102,6 @@ public class SecurityConfig {
 			.addFilter(digestAuthenticationFilter())
 			.exceptionHandling().authenticationEntryPoint(digestAuthenticationEntryPoint());
 		}
-		
+
 	}
 }

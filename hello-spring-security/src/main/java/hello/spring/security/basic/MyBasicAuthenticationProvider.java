@@ -37,10 +37,10 @@ public class MyBasicAuthenticationProvider implements AuthenticationProvider {
 			String login = String.valueOf(authentication.getPrincipal());
 			String password = String.valueOf(authentication.getCredentials());
 			log.debug("user=" + login + " password=" + password + " " + (password == null));
-			User user = userService.getUserRepository().findByLogin(login);
+			User user = userService.findByLogin(login);
 			if (user != null && StringUtils.equals(user.getLogin(), login) 
 					&& passwordService.validatePassword(user, password)) {
-				user = userService.populateUser(user);
+				//user = userService.populateUser(user);
 				List<GrantedAuthority> authorities = new ArrayList<>();
 				user.getRoles().stream().filter(role -> role != null).forEach(role -> {
 					role.getPermissions().stream().filter(perm -> perm != null && role.getPermissions() != null)

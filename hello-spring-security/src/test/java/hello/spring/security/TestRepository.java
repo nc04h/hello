@@ -97,7 +97,8 @@ public class TestRepository {
 		user = new User();
 		user.setLogin(login);
 		user.setPassword(passwordService.enryptPassword(password));
-		user.setMd5Password(passwordService.md5Hex(login + ":Hello Digest Auth:" + password));
+		user.setMd5Password(passwordService.md5Hex(login + ":" + SecurityConfig.DigestAuthenticationConfig.REALM_NAME 
+				+ ":" + password));
 		role.setUser(user);
 		Set<Role> roles = new HashSet<>();
 		roles.add(role);
