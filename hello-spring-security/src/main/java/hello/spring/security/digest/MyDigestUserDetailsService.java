@@ -48,6 +48,7 @@ public class MyDigestUserDetailsService implements UserDetailsService {
 					authorities.add(new SimpleGrantedAuthority(perm.getName()));
 				});
 			});
+			log.debug("authorities=" + authorities);
 			UserDetails userDetails = new User(user.getLogin(), user.getMd5Password(), authorities);
 			log.debug(userDetails);
 			return userDetails;
