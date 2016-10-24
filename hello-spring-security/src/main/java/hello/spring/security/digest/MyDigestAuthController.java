@@ -32,7 +32,14 @@ public class MyDigestAuthController {
 		} finally {
 			log.debug("<--- auth");
 		}
+	}
 
+	@PreAuthorize("hasRole('ROLE_TOKEN_USER')")
+	@RequestMapping("/token")
+	public @ResponseBody String token(Authentication authentication, Principal principal) {
+		// TODO
+		log.debug("---> token");
+		return null;
 	}
 
 }
