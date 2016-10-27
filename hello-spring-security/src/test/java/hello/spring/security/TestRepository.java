@@ -58,6 +58,7 @@ public class TestRepository {
 	public void testCreateRole() {
 		createRole("Basic", "ROLE_BASIC_USER");
 		createRole("Digest", "ROLE_DIGEST_USER");
+		createRole("Token", "ROLE_TOKEN_USER");
 	}
 
 	private Role createRole(String roleName, String permissionName) {
@@ -84,6 +85,7 @@ public class TestRepository {
 	public void testCreateUser() {
 		createUser("basic", "auth", "Basic");
 		createUser("digest", "auth", "Digest");
+		createUser("token", "auth", "Token");
 	}
 
 	private User createUser(String login, String password, String roleName) {

@@ -19,6 +19,8 @@ public class UserService {
 	private UserRepository userRepository;
 	@Autowired
 	private RoleRepository roleRepository;
+	@Autowired
+	private UserTokenService userTokenService;
 
 	public UserRepository getUserRepository() {
 		return userRepository;
@@ -41,4 +43,11 @@ public class UserService {
 		return user;
 	}
 
+	public User updateUser(User user) {
+		if (user != null) {
+			user = userRepository.save(user);
+			userTokenService.invalidateToken(user.getLogin());
+		}
+		return user;
+	}
 }

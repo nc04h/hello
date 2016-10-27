@@ -37,9 +37,6 @@ public class User implements Serializable {
 	@Column(name = "MD5_PASSWORD", nullable = false)
 	private String md5Password;
 
-	@Column(name = "TOKEN", nullable = false, unique = true)
-	private String token;
-
 	@OneToMany(fetch = FetchType.LAZY)
 	@Cascade(value = { CascadeType.SAVE_UPDATE })
 	@JoinTable(name = "USER_ROLES", 
@@ -87,14 +84,6 @@ public class User implements Serializable {
 		this.md5Password = md5Password;
 	}
 
-	public String getToken() {
-		return token;
-	}
-
-	public void setToken(String token) {
-		this.token = token;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -121,7 +110,7 @@ public class User implements Serializable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("User [id=").append(id).append(", login=").append(login).append(", password=").append(password)
-				.append(", md5Password=").append(md5Password).append(", token=").append(token).append(", roles=")
+				.append(", md5Password=").append(md5Password).append(", roles=")
 				.append(roles).append("]");
 		return builder.toString();
 	}
