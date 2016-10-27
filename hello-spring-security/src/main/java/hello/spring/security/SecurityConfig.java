@@ -29,6 +29,9 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationEn
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.DigestAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 import hello.spring.security.basic.MyBasicAuthenticationProvider;
 import hello.spring.security.digest.MyDigestAuthenticationProvider;
@@ -119,6 +122,7 @@ public class SecurityConfig {
 			.antMatcher("/digest/**")
 			.addFilter(digestAuthenticationFilter())
 			.exceptionHandling().authenticationEntryPoint(digestAuthenticationEntryPoint())
+			.and().csrf().disable()
 			;
 		}
 
@@ -132,6 +136,7 @@ public class SecurityConfig {
 		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 			auth.authenticationProvider(digestAuthProvider);
 		}
+
 	}
 
 	@Configuration
@@ -153,7 +158,7 @@ public class SecurityConfig {
 		protected void configure(HttpSecurity http) throws Exception {
 			http
 			.antMatcher("/token/**")
-			.addFilter(tokenAuthenticationFilter())
+			.addFilterAfter(tokenAuthenticationFilter(), DigestAuthenticationFilter.class)
 			.exceptionHandling().authenticationEntryPoint(tokenAuthenticationEntryPoint());		
 		}
 

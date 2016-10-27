@@ -1,7 +1,10 @@
 package hello.spring.security.service;
 
+import java.security.SecureRandom;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.codec.Base64;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,4 +44,17 @@ public class UserService {
 		return user;
 	}
 
+	public User updateToken(User user) {
+		if (user != null) {
+			user.setToken(generateTokenData());
+			user = userRepository.save(user);
+		}
+		return user;
+	}
+	
+	protected String generateTokenData() {
+		byte[] newSeries = new byte[16];
+		new SecureRandom().nextBytes(newSeries);
+		return new String(Base64.encode(newSeries));
+	}
 }

@@ -37,7 +37,7 @@ public class User implements Serializable {
 	@Column(name = "MD5_PASSWORD", nullable = false)
 	private String md5Password;
 
-	@Column(name = "TOKEN", nullable = false, unique = true)
+	@Column(name = "TOKEN", nullable = true, unique = true)
 	private String token;
 
 	@OneToMany(fetch = FetchType.LAZY)
