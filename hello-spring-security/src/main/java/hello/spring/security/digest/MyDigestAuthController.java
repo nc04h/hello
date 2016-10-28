@@ -24,7 +24,7 @@ import hello.spring.security.service.UserTokenService;
 public class MyDigestAuthController {
 
 	private static final Logger log = Logger.getLogger(MyDigestAuthController.class);
-
+	
 	@Autowired
 	private UserService userService;
 	@Autowired
