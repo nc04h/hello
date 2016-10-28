@@ -23,12 +23,11 @@ public class MyTokenAuthentication extends AbstractAuthenticationToken {
 
 	@Override
 	public Object getCredentials() {
-		return "";
+		return token;
 	}
 
 	@Override
 	public Object getPrincipal() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

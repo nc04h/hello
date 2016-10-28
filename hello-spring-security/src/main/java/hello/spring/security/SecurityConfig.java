@@ -1,7 +1,6 @@
 package hello.spring.security;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -13,25 +12,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.DigestAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfTokenRepository;
-import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 import hello.spring.security.basic.MyBasicAuthenticationProvider;
 import hello.spring.security.digest.MyDigestAuthenticationProvider;
@@ -150,6 +143,9 @@ public class SecurityConfig {
 		public MyTokenAuthenticationFilter tokenAuthenticationFilter() throws Exception {
 			MyTokenAuthenticationFilter filter = new MyTokenAuthenticationFilter("/token/**");
 			// TODO
+			SavedRequestAwareAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
+			successHandler.setUseReferer(true);
+			filter.setAuthenticationSuccessHandler(successHandler);
 			filter.setAuthenticationManager(authenticationManager());
 			return filter;
 		}
@@ -158,8 +154,9 @@ public class SecurityConfig {
 		protected void configure(HttpSecurity http) throws Exception {
 			http
 			.antMatcher("/token/**")
-			.addFilterAfter(tokenAuthenticationFilter(), DigestAuthenticationFilter.class)
-			.exceptionHandling().authenticationEntryPoint(tokenAuthenticationEntryPoint());		
+			.addFilterAfter(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+			.exceptionHandling().authenticationEntryPoint(tokenAuthenticationEntryPoint())
+			;
 		}
 
 		private AuthenticationEntryPoint tokenAuthenticationEntryPoint() {

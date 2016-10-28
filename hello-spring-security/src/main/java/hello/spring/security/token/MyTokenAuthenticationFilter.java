@@ -15,19 +15,16 @@ public class MyTokenAuthenticationFilter extends AbstractAuthenticationProcessin
 
 	private static final Logger log = Logger.getLogger(MyTokenAuthenticationFilter.class);
 
-	public static final String TOKEN_HEADER = "x-my-token";
-
 	public MyTokenAuthenticationFilter(String defaultFilterProcessesUrl) {
 		super(defaultFilterProcessesUrl);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException, IOException, ServletException {
-		// TODO Auto-generated method stub
-		String token = request.getHeader(TOKEN_HEADER);
+		String token = request.getHeader(TokenConstants.TOKEN_HEADER);
 		log.debug("token=" + token);
+		log.debug("request=" + request.getParameterMap());
 		return getAuthenticationManager().authenticate(new MyTokenAuthentication(token));
 	}
 
