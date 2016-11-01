@@ -24,7 +24,8 @@ public class MyTokenAuthenticationFilter extends AbstractAuthenticationProcessin
 			throws AuthenticationException, IOException, ServletException {
 		String token = request.getHeader(TokenConstants.TOKEN_HEADER);
 		log.debug("token=" + token);
-		log.debug("request=" + request.getParameterMap());
+		log.debug("request=" + request.getRequestURI());
+
 		return getAuthenticationManager().authenticate(new MyTokenAuthentication(token));
 	}
 

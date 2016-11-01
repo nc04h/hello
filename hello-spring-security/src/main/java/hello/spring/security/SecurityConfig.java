@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,14 +18,19 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.ExceptionTranslationFilter;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.DigestAuthenticationFilter;
+import org.springframework.security.web.savedrequest.SavedRequest;
 
 import hello.spring.security.basic.MyBasicAuthenticationProvider;
 import hello.spring.security.digest.MyDigestAuthenticationProvider;
@@ -143,9 +149,9 @@ public class SecurityConfig {
 		public MyTokenAuthenticationFilter tokenAuthenticationFilter() throws Exception {
 			MyTokenAuthenticationFilter filter = new MyTokenAuthenticationFilter("/token/**");
 			// TODO
-			SavedRequestAwareAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
-			successHandler.setUseReferer(true);
-			filter.setAuthenticationSuccessHandler(successHandler);
+//			SavedRequestAwareAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
+//			successHandler.setUseReferer(true);
+//			filter.setAuthenticationSuccessHandler(successHandler);
 			filter.setAuthenticationManager(authenticationManager());
 			return filter;
 		}
@@ -155,6 +161,8 @@ public class SecurityConfig {
 			http
 			.antMatcher("/token/**")
 			.addFilterAfter(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+			.authorizeRequests().anyRequest().authenticated()
+			.and()
 			.exceptionHandling().authenticationEntryPoint(tokenAuthenticationEntryPoint())
 			;
 		}
