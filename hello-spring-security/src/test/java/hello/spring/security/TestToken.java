@@ -1,8 +1,5 @@
 package hello.spring.security;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
 import org.apache.log4j.Logger;
@@ -21,7 +18,6 @@ public class TestToken extends TestAbstract {
 	@Test
 	public void testTokenAuth() {
 		String url = "http://localhost:1234/token/auth";
-		String login = "token";
 		final HttpHost host = new HttpHost("localhost", 1234);
 		HttpClient httpClient = httpClient(host);
 		RestTemplate restTemplate = new RestTemplate(new TestRequestFactory(httpClient, host));
