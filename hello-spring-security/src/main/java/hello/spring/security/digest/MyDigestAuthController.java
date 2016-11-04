@@ -6,8 +6,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,15 +30,9 @@ public class MyDigestAuthController {
 
 	@PreAuthorize("hasRole('ROLE_DIGEST_USER')")
 	@RequestMapping(path = "/auth", method = RequestMethod.GET)
-	public @ResponseBody String auth(Authentication authentication, Principal principal) {
+	public @ResponseBody String auth() {
 		try {
 			log.debug("---> auth");
-			log.debug("authentication=" + authentication);
-			log.debug("principal=" + principal);
-			log.debug(((UsernamePasswordAuthenticationToken) principal).getPrincipal());
-			for (GrantedAuthority auth: authentication.getAuthorities()) {
-				log.debug(auth.getAuthority());
-			}
 			return "index";
 		} finally {
 			log.debug("<--- auth");
@@ -49,9 +41,8 @@ public class MyDigestAuthController {
 
 	@PreAuthorize("hasRole('ROLE_TOKEN_USER')")
 	@RequestMapping(path = "/token", method = RequestMethod.PUT)
-	public @ResponseBody String token(Authentication authentication, Principal principal) {
+	public @ResponseBody String token(Principal principal) {
 		log.debug("---> token");
-		log.debug("authentication=" + authentication);
 		log.debug("principal=" + principal);
 		log.debug(((UsernamePasswordAuthenticationToken) principal).getPrincipal());
 		User user = userService.findByLogin(principal.getName());

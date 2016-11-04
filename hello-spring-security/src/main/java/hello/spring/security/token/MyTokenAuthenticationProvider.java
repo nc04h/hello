@@ -40,6 +40,9 @@ public class MyTokenAuthenticationProvider implements AuthenticationProvider {
 				throw new BadCredentialsException("Invalid credentials");
 			}
 			MyTokenAuthentication auth = (MyTokenAuthentication) authentication;
+			if (auth.isAuthenticated()) {
+				return auth;
+			}
 			UserToken userToken = userTokenService.validateToken(auth.getCredentials().toString());
 			User user = userService.findByLogin(userToken.getLogin());
 			List<GrantedAuthority> authorities = new ArrayList<>();
@@ -50,8 +53,10 @@ public class MyTokenAuthenticationProvider implements AuthenticationProvider {
 			});
 			MyTokenAuthentication result = new MyTokenAuthentication(auth.getCredentials().toString(), authorities);
 			result.setAuthenticated(true);
+			log.debug("result=" + result);
 			return result;
 		} catch (Exception e) {
+			log.error(e);
 			throw new BadCredentialsException("authentication error", e);
 		}
 	}
