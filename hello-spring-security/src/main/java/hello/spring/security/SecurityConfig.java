@@ -26,7 +26,6 @@ import org.springframework.security.web.authentication.www.DigestAuthenticationE
 import org.springframework.security.web.authentication.www.DigestAuthenticationFilter;
 
 import hello.spring.security.basic.MyBasicAuthenticationProvider;
-import hello.spring.security.digest.MyDigestAuthenticationProvider;
 import hello.spring.security.digest.MyDigestUserDetailsService;
 import hello.spring.security.token.MyTokenAuthenticationFilter;
 import hello.spring.security.token.MyTokenAuthenticationProvider;
@@ -87,8 +86,6 @@ public class SecurityConfig {
 		public static final String REALM_NAME = "Hello Digest Auth";
 
 		@Autowired
-		private MyDigestAuthenticationProvider digestAuthProvider;
-		@Autowired
 		private MyDigestUserDetailsService userDetailsService;
 
 		@Bean
@@ -117,18 +114,6 @@ public class SecurityConfig {
 			.and().csrf().disable()
 			;
 		}
-
-		@Bean(name = "digestAuthenticationManager")
-		@Override
-		public AuthenticationManager authenticationManagerBean() throws Exception {
-			return super.authenticationManagerBean();
-		}
-
-		@Override
-		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-			auth.authenticationProvider(digestAuthProvider);
-		}
-
 	}
 
 	@Configuration

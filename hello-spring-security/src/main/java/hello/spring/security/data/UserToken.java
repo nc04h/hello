@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "USER_TOKENS")
@@ -23,7 +24,7 @@ public class UserToken implements Serializable {
 	@Column(name = "LOGIN", nullable = false, unique = true)
 	private String login;
 
-	@Column(name = "TOKEN", nullable = false, unique = true)
+	@Transient
 	private String token;
 
 	@Column(name = "EXPIRATION", nullable = false, unique = false)

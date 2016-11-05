@@ -32,7 +32,7 @@ public class MyTokenAuthenticationFilter extends GenericFilterBean {
 		log.debug("token=" + token);
 		log.debug("request=" + request.getRequestURI());
 
-		if (isAuthenticationRequired()) {
+		if (token != null && isAuthenticationRequired()) {
 			MyTokenAuthentication authToken = new MyTokenAuthentication(token);
 			Authentication authResult = getAuthenticationManager().authenticate(authToken);
 			log.debug("authResult=" + authResult);
@@ -52,12 +52,11 @@ public class MyTokenAuthenticationFilter extends GenericFilterBean {
 
 	private boolean isAuthenticationRequired() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth == null 
-				|| !auth.isAuthenticated() 
-				|| !(auth instanceof MyTokenAuthentication)) {
+		log.debug("isAuthenticationRequired: " + auth);
+		if (auth == null || !auth.isAuthenticated()) {
 			return true;
-		} else {
-			return false;
 		}
+		log.debug("isAuthenticated: " + auth.isAuthenticated());
+		return false;
 	}
 }

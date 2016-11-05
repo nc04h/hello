@@ -9,6 +9,4 @@ import hello.spring.security.data.UserToken;
 public interface UserTokenRepository extends CrudRepository<UserToken, Long> {
 
 	public UserToken findByLogin(String login);
-
-	public UserToken findByToken(String token);
 }

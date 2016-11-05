@@ -45,9 +45,11 @@ public class MyDigestAuthController {
 		log.debug("---> token");
 		log.debug("principal=" + principal);
 		log.debug(((UsernamePasswordAuthenticationToken) principal).getPrincipal());
+		log.debug(((UsernamePasswordAuthenticationToken) principal).getCredentials());
 		User user = userService.findByLogin(principal.getName());
 		Assert.notNull(user, "user not found");
-		UserToken token = userTokenService.updateToken(user.getLogin());
+		UserToken token = userTokenService.updateToken(user.getLogin(), 
+				user.getMd5Password());
 		Assert.notNull(token, "token not found");
 		return token.getToken();
 	}

@@ -20,13 +20,14 @@ public class MyDigestAuthenticationProvider implements AuthenticationProvider {
 		log.debug(authentication);
 		log.debug(authentication.getPrincipal());
 		log.debug(authentication.getCredentials());
-		log.debug(authentication.isAuthenticated());
 		if (!(authentication.getPrincipal() instanceof User)) {
 			throw new BadCredentialsException("Invalid principal");
 		}
 		User user = (User) authentication.getPrincipal();
+		log.debug("password=" + user.getPassword());
 		Authentication auth = new UsernamePasswordAuthenticationToken(
 				user.getUsername(), user.getPassword(), user.getAuthorities());
+		log.debug("auth=" + auth);
 		return auth;
 	}
 

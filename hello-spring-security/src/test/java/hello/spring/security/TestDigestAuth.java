@@ -7,6 +7,8 @@ import org.junit.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.util.Assert;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 public class TestDigestAuth extends TestAbstract {
@@ -23,6 +25,23 @@ public class TestDigestAuth extends TestAbstract {
 		RestTemplate restTemplate = new RestTemplate(new TestRequestFactory(httpClient, host));
 		String response = restTemplate.exchange(url, HttpMethod.GET, null, String.class).getBody();
 		log.debug(response);
+	}
+
+	@Test
+	public void testDigestAuthWithWrongPassword() {
+		try {
+			String url = "http://localhost:1234/digest/auth";
+			String login = "digest";
+			String password = "wrong password";
+			final HttpHost host = new HttpHost("localhost", 1234);
+			HttpClient httpClient = httpClient(login, password, host);
+			RestTemplate restTemplate = new RestTemplate(new TestRequestFactory(httpClient, host));
+			String response = restTemplate.exchange(url, HttpMethod.GET, null, String.class).getBody();
+			log.debug(response);
+			Assert.isTrue(false);
+		} catch (RestClientException e) {
+			log.error(e);
+		}
 	}
 
 	@Test
