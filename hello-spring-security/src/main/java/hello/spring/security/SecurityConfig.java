@@ -31,6 +31,7 @@ import hello.spring.security.basic.MyBasicAuthenticationProvider;
 import hello.spring.security.digest.MyDigestUserDetailsService;
 import hello.spring.security.oauth.MyOAuthAuthenticationHandler;
 import hello.spring.security.oauth.MyOAuthDetailsService;
+import hello.spring.security.oauth.MyOAuthProviderTokenServices;
 import hello.spring.security.token.MyTokenAuthenticationFilter;
 import hello.spring.security.token.MyTokenAuthenticationProvider;
 
@@ -176,6 +177,8 @@ public class SecurityConfig {
 		private MyOAuthDetailsService consumerDetailsService;
 		@Autowired
 		private MyOAuthAuthenticationHandler authHandler;
+		@Autowired
+		private MyOAuthProviderTokenServices tokenServices;
 
 		private OAuthProcessingFilterEntryPoint oauthEntryPoint() {
 			OAuthProcessingFilterEntryPoint entryPoint = new OAuthProcessingFilterEntryPoint();
@@ -189,6 +192,7 @@ public class SecurityConfig {
 			filter.setAuthenticationEntryPoint(oauthEntryPoint());
 			filter.setConsumerDetailsService(consumerDetailsService);
 			filter.setAuthHandler(authHandler);
+			filter.setTokenServices(tokenServices);
 			return filter;
 		}
 
@@ -196,7 +200,7 @@ public class SecurityConfig {
 		protected void configure(HttpSecurity http) throws Exception {
 			http
 			.antMatcher("/oauth/**")
-			.addFilter(oauthFilter());
+			.addFilterAfter(oauthFilter(), UsernamePasswordAuthenticationFilter.class);
 		}
 
 	}

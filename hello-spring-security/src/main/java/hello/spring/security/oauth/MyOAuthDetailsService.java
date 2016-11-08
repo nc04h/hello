@@ -6,8 +6,9 @@ import org.springframework.security.oauth.provider.BaseConsumerDetails;
 import org.springframework.security.oauth.provider.ConsumerDetails;
 import org.springframework.security.oauth.provider.ConsumerDetailsService;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class MyOAuthDetailsService implements ConsumerDetailsService  {
 
 	private static final Logger log = Logger.getLogger(MyOAuthDetailsService.class);

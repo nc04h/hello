@@ -14,6 +14,7 @@ public class MyOAuthController {
 	@RequestMapping(path = "/auth", method = RequestMethod.GET)
 	public String auth() {
 		// TODO
+	    log.debug("auth");
 		return "index";
 	}
 }
