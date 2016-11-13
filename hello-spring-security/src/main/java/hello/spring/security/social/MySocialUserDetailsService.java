@@ -1,4 +1,4 @@
-package hello.spring.security.digest;
+package hello.spring.security.social;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,20 +6,22 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.social.security.SocialUserDetails;
+import org.springframework.social.security.SocialUserDetailsService;
 import org.springframework.stereotype.Service;
 
 import hello.spring.security.service.UserService;
 
 //@Service
-public class MyDigestUserDetailsService implements UserDetailsService {
+public class MySocialUserDetailsService implements SocialUserDetailsService, UserDetailsService {
 
-	private static Logger log = Logger.getLogger(MyDigestUserDetailsService.class);
+	private static final Logger log = Logger.getLogger(MySocialUserDetailsService.class);
 
 	@Autowired
 	private UserService userService;
@@ -42,12 +44,21 @@ public class MyDigestUserDetailsService implements UserDetailsService {
 				});
 			});
 			log.debug("authorities=" + authorities);
-			UserDetails userDetails = new User(user.getLogin(), user.getMd5Password(), authorities);
+			UserDetails userDetails = new MySocialUserDetails(user.getLogin(), user.getMd5Password(), authorities);
 			log.debug(userDetails);
 			return userDetails;
 		} finally {
 			log.debug("<--- loadUserByUsername");
 		}
+	}
+
+	@Override
+	public SocialUserDetails loadUserByUserId(String userId) throws UsernameNotFoundException, DataAccessException {
+		UserDetails userDetails = loadUserByUsername(userId);
+		if (userDetails == null) {
+			throw new UsernameNotFoundException("username not found");
+		}
+		return (MySocialUserDetails) userDetails;
 	}
 
 }

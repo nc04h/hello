@@ -33,6 +33,7 @@ public class MyDigestAuthenticationProvider implements AuthenticationProvider {
 
 	@Override
 	public boolean supports(Class<?> authentication) {
+		log.debug("---> supports " + authentication);
 		return authentication.isAssignableFrom(UsernamePasswordAuthenticationToken.class);
 	}
 

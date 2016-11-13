@@ -24,7 +24,7 @@ public class TestToken extends TestAbstract {
 		HttpClient httpClient = httpClient(host);
 		RestTemplate restTemplate = new RestTemplate(new TestRequestFactory(httpClient, host));
 		HttpHeaders headers = new HttpHeaders();
-		headers.add(TokenConstants.TOKEN_HEADER, "ryzBLEZ3b2D5G80lyGXJabYd7C/YZal41bb+ZDHvuteHS2/O3BJQA2KznpiyQIUhYED5Hr+axNY1QoIqBNErdg==");
+		headers.add(TokenConstants.TOKEN_HEADER, "rNg7BudwpYnpTiSCce6sFdYukiLWSTfAQ40a/D23gi1IB8O43bcS7au312+/Cy08oQxuLtOUJFXtPKdpgDlKZA==");
 		HttpEntity<?> entity = new HttpEntity<Object>(headers);
 		String response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class).getBody();
 		log.debug(response);

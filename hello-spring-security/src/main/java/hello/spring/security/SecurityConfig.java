@@ -1,6 +1,8 @@
 package hello.spring.security;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -12,43 +14,60 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.oauth.provider.OAuthProcessingFilterEntryPoint;
-import org.springframework.security.oauth.provider.filter.ProtectedResourceProcessingFilter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.DigestAuthenticationFilter;
+import org.springframework.social.security.SocialUserDetailsService;
+import org.springframework.social.security.SpringSocialConfigurer;
 
 import hello.spring.security.basic.MyBasicAuthenticationProvider;
+import hello.spring.security.digest.MyDigestAuthenticationProvider;
 import hello.spring.security.digest.MyDigestUserDetailsService;
-import hello.spring.security.oauth.MyOAuthAuthenticationHandler;
-import hello.spring.security.oauth.MyOAuthDetailsService;
-import hello.spring.security.oauth.MyOAuthProviderTokenServices;
+import hello.spring.security.social.MySocialUserDetailsService;
 import hello.spring.security.token.MyTokenAuthenticationFilter;
 import hello.spring.security.token.MyTokenAuthenticationProvider;
 
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
 	private static final Logger log = Logger.getLogger(SecurityConfig.class);
 
+	@Autowired
+	private MyBasicAuthenticationProvider basicAuthProvider;
+	@Autowired
+	private MyDigestAuthenticationProvider digestAuthProvider;
+	@Autowired
+	private MyTokenAuthenticationProvider tokenAuthProvider;
+	
+	@Bean
+    public AuthenticationManager authenticationManager() {
+		List<AuthenticationProvider> providers = new ArrayList<>();
+		providers.add(basicAuthProvider);
+		providers.add(digestAuthProvider);
+		return new ProviderManager(providers);
+    }
+
+	
 	@Configuration
 	@Order(1)
-	public static class BasicAuthenticationConfig extends WebSecurityConfigurerAdapter {
+	public class BasicAuthenticationConfig extends WebSecurityConfigurerAdapter {
 
 		public static final String REALM_NAME = "Hello Basic Auth";
 
-		@Autowired
-		private MyBasicAuthenticationProvider basicAuthProvider;
 
 		public BasicAuthenticationEntryPoint basicAuthenticationEntryPoint() {
 			BasicAuthenticationEntryPoint entryPoint = new BasicAuthenticationEntryPoint();
@@ -67,16 +86,16 @@ public class SecurityConfig {
 		protected void configure(HttpSecurity http) throws Exception {
 			http
 			.antMatcher("/basic/**")
-			.addFilter(basicAuthenticationFilter())
+			.addFilterAfter(basicAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 			.exceptionHandling().authenticationEntryPoint(basicAuthenticationEntryPoint())
 			;
 		}
 
-		@Bean(name = "basicAuthenticationManager")
-		@Override
-		public AuthenticationManager authenticationManagerBean() throws Exception {
-			return super.authenticationManagerBean();
-		}
+//		@Bean(name = "basicAuthenticationManager")
+//		@Override
+//		public AuthenticationManager authenticationManagerBean() throws Exception {
+//			return super.authenticationManagerBean();
+//		}
 
 		@Override
 		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -86,19 +105,21 @@ public class SecurityConfig {
 
 	@Configuration
 	@Order(2)
-	public static class DigestAuthenticationConfig extends WebSecurityConfigurerAdapter {
+	public class DigestAuthenticationConfig extends WebSecurityConfigurerAdapter {
 
 		public static final String REALM_NAME = "Hello Digest Auth";
 
-		@Autowired
-		private MyDigestUserDetailsService userDetailsService;
+//		@Autowired
+//		private MyDigestUserDetailsService userDetailsService;
 
+		
 		@Bean
 		public DigestAuthenticationFilter digestAuthenticationFilter() throws Exception {
 			DigestAuthenticationFilter filter = new DigestAuthenticationFilter();
 			filter.setAuthenticationEntryPoint(digestAuthenticationEntryPoint());
-			filter.setUserDetailsService(userDetailsService);
+			filter.setUserDetailsService(userDetailsService());
 			filter.setPasswordAlreadyEncoded(true);
+			filter.setCreateAuthenticatedToken(false);
 			return filter;
 		}
 
@@ -113,20 +134,37 @@ public class SecurityConfig {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 			http
-			.antMatcher("/digest/**")
-			.addFilter(digestAuthenticationFilter())
 			.exceptionHandling().authenticationEntryPoint(digestAuthenticationEntryPoint())
-			.and().csrf().disable()
+			.and()
+			.addFilter(digestAuthenticationFilter())
+//			.addFilterAfter(digestAuthenticationFilter(), BasicAuthenticationFilter.class)
+			.authenticationProvider(digestAuthProvider)
+			.antMatcher("/digest/**")
+				.csrf().disable()
+				.authorizeRequests()
+				.anyRequest()
+				.authenticated()
 			;
 		}
+		
+		@Bean
+		@Override
+		public MyDigestUserDetailsService userDetailsService() {
+			return new MyDigestUserDetailsService();
+		}
+
+//		@Bean(name = "digestAuthenticationManager")
+//		@Override
+//		public AuthenticationManager authenticationManagerBean() throws Exception {
+//			List<AuthenticationProvider> providers = new ArrayList<>();
+//			providers.add(digestAuthProvider);
+//			return new ProviderManager(providers);
+//		}
 	}
 
 	@Configuration
 	@Order(3)
-	public static class TokenAuthenticationConfig extends WebSecurityConfigurerAdapter {
-
-		@Autowired
-		private MyTokenAuthenticationProvider tokenAuthProvider;
+	public class TokenAuthenticationConfig extends WebSecurityConfigurerAdapter {
 
 		@Bean
 		public MyTokenAuthenticationFilter tokenAuthenticationFilter() throws Exception {
@@ -139,7 +177,7 @@ public class SecurityConfig {
 		protected void configure(HttpSecurity http) throws Exception {
 			http
 			.antMatcher("/token/**")
-			.addFilterAfter(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+			.addFilterAfter(tokenAuthenticationFilter(), DigestAuthenticationFilter.class)
 			.authenticationProvider(tokenAuthProvider)
 			.exceptionHandling().authenticationEntryPoint(tokenAuthenticationEntryPoint())
 			;
@@ -155,11 +193,11 @@ public class SecurityConfig {
 			};
 		}
 
-		@Bean(name = "tokenAuthenticationManager")
-		@Override
-		public AuthenticationManager authenticationManagerBean() throws Exception {
-			return super.authenticationManagerBean();
-		}
+//		@Bean(name = "tokenAuthenticationManager")
+//		@Override
+//		public AuthenticationManager authenticationManagerBean() throws Exception {
+//			return super.authenticationManagerBean();
+//		}
 
 		@Override
 		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -169,38 +207,28 @@ public class SecurityConfig {
 
 	@Configuration
 	@Order(4)
-	public static class OAuthConfig extends WebSecurityConfigurerAdapter {
-
-		public static final String REALM_NAME = "Hello OAuth";
-
-		@Autowired
-		private MyOAuthDetailsService consumerDetailsService;
-		@Autowired
-		private MyOAuthAuthenticationHandler authHandler;
-		@Autowired
-		private MyOAuthProviderTokenServices tokenServices;
-
-		private OAuthProcessingFilterEntryPoint oauthEntryPoint() {
-			OAuthProcessingFilterEntryPoint entryPoint = new OAuthProcessingFilterEntryPoint();
-			entryPoint.setRealmName(REALM_NAME);
-			return entryPoint;
-		}
-
-		@Bean
-		public ProtectedResourceProcessingFilter oauthFilter() {
-			ProtectedResourceProcessingFilter filter = new ProtectedResourceProcessingFilter();
-			filter.setAuthenticationEntryPoint(oauthEntryPoint());
-			filter.setConsumerDetailsService(consumerDetailsService);
-			filter.setAuthHandler(authHandler);
-			filter.setTokenServices(tokenServices);
-			return filter;
-		}
+	public class SocialConfig extends WebSecurityConfigurerAdapter {
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 			http
-			.antMatcher("/oauth/**")
-			.addFilterAfter(oauthFilter(), UsernamePasswordAuthenticationFilter.class);
+			.antMatcher("/twitter/**")
+			.authorizeRequests()
+			.anyRequest()
+			.authenticated()
+			.and()
+			.apply(new SpringSocialConfigurer())
+			;
+		}
+
+		@Override
+		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+			auth.userDetailsService(socialUserDetailsService());
+		}
+
+		@Bean
+		public MySocialUserDetailsService socialUserDetailsService() {
+			return new MySocialUserDetailsService();
 		}
 
 	}
