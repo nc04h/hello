@@ -13,13 +13,13 @@ public class TestTwitter extends TestAbstract {
 
 	@Test
 	public void testAuth() {
-		String url = "http://localhost:1234/social/auth";
+		String url = "http://localhost:1234/signin/twitter";
 		String login = "alopwpmp";
 		String password = "auth";
 		final HttpHost host = new HttpHost("localhost", 1234);
 		HttpClient httpClient = httpClient(login, password, host);
 		RestTemplate restTemplate = new RestTemplate(new TestRequestFactory(httpClient, host));
-		String response = restTemplate.exchange(url, HttpMethod.GET, null, String.class).getBody();
+		String response = restTemplate.exchange(url, HttpMethod.POST, null, String.class).getBody();
 		log.debug(response);
 	}
 }

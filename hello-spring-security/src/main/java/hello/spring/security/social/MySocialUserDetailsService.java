@@ -14,11 +14,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.social.security.SocialUserDetails;
 import org.springframework.social.security.SocialUserDetailsService;
-import org.springframework.stereotype.Service;
 
 import hello.spring.security.service.UserService;
 
-//@Service
 public class MySocialUserDetailsService implements SocialUserDetailsService, UserDetailsService {
 
 	private static final Logger log = Logger.getLogger(MySocialUserDetailsService.class);

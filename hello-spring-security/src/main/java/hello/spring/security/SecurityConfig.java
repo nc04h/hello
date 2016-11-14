@@ -21,16 +21,13 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.DigestAuthenticationFilter;
-import org.springframework.social.security.SocialUserDetailsService;
 import org.springframework.social.security.SpringSocialConfigurer;
 
 import hello.spring.security.basic.MyBasicAuthenticationProvider;
@@ -52,16 +49,16 @@ public class SecurityConfig {
 	private MyDigestAuthenticationProvider digestAuthProvider;
 	@Autowired
 	private MyTokenAuthenticationProvider tokenAuthProvider;
-	
+
 	@Bean
-    public AuthenticationManager authenticationManager() {
+	public AuthenticationManager authenticationManager() {
 		List<AuthenticationProvider> providers = new ArrayList<>();
 		providers.add(basicAuthProvider);
 		providers.add(digestAuthProvider);
 		return new ProviderManager(providers);
-    }
+	}
 
-	
+
 	@Configuration
 	@Order(1)
 	public class BasicAuthenticationConfig extends WebSecurityConfigurerAdapter {
@@ -91,12 +88,6 @@ public class SecurityConfig {
 			;
 		}
 
-//		@Bean(name = "basicAuthenticationManager")
-//		@Override
-//		public AuthenticationManager authenticationManagerBean() throws Exception {
-//			return super.authenticationManagerBean();
-//		}
-
 		@Override
 		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 			auth.authenticationProvider(basicAuthProvider);
@@ -109,10 +100,6 @@ public class SecurityConfig {
 
 		public static final String REALM_NAME = "Hello Digest Auth";
 
-//		@Autowired
-//		private MyDigestUserDetailsService userDetailsService;
-
-		
 		@Bean
 		public DigestAuthenticationFilter digestAuthenticationFilter() throws Exception {
 			DigestAuthenticationFilter filter = new DigestAuthenticationFilter();
@@ -137,29 +124,20 @@ public class SecurityConfig {
 			.exceptionHandling().authenticationEntryPoint(digestAuthenticationEntryPoint())
 			.and()
 			.addFilter(digestAuthenticationFilter())
-//			.addFilterAfter(digestAuthenticationFilter(), BasicAuthenticationFilter.class)
 			.authenticationProvider(digestAuthProvider)
 			.antMatcher("/digest/**")
-				.csrf().disable()
-				.authorizeRequests()
-				.anyRequest()
-				.authenticated()
+			.csrf().disable()
+			.authorizeRequests()
+			.anyRequest()
+			.authenticated()
 			;
 		}
-		
+
 		@Bean
 		@Override
 		public MyDigestUserDetailsService userDetailsService() {
 			return new MyDigestUserDetailsService();
 		}
-
-//		@Bean(name = "digestAuthenticationManager")
-//		@Override
-//		public AuthenticationManager authenticationManagerBean() throws Exception {
-//			List<AuthenticationProvider> providers = new ArrayList<>();
-//			providers.add(digestAuthProvider);
-//			return new ProviderManager(providers);
-//		}
 	}
 
 	@Configuration
@@ -193,12 +171,6 @@ public class SecurityConfig {
 			};
 		}
 
-//		@Bean(name = "tokenAuthenticationManager")
-//		@Override
-//		public AuthenticationManager authenticationManagerBean() throws Exception {
-//			return super.authenticationManagerBean();
-//		}
-
 		@Override
 		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 			auth.authenticationProvider(tokenAuthProvider);
@@ -209,15 +181,18 @@ public class SecurityConfig {
 	@Order(4)
 	public class SocialConfig extends WebSecurityConfigurerAdapter {
 
+		
+		
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
+			SpringSocialConfigurer configurer = new SpringSocialConfigurer();
 			http
-			.antMatcher("/twitter/**")
+			.antMatcher("/social/twitter/**")
 			.authorizeRequests()
 			.anyRequest()
 			.authenticated()
 			.and()
-			.apply(new SpringSocialConfigurer())
+			.apply(configurer)
 			;
 		}
 
