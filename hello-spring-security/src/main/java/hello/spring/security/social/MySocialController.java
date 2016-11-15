@@ -1,6 +1,7 @@
 package hello.spring.security.social;
 
 import org.apache.log4j.Logger;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -22,6 +23,17 @@ public class MySocialController {
 		}
 	}
 	
+	@RequestMapping(path = "/signup", method = RequestMethod.GET)
+	public @ResponseBody String signup() {
+		try {
+			log.debug("---> signup");
+			return "index";
+		} finally {
+			log.debug("<--- signup");
+		}
+	}
+	
+	@PreAuthorize("hasRole('ROLE_TWITTER_USER')")
 	@RequestMapping(path = "/twitter/auth", method = RequestMethod.GET)
 	public @ResponseBody String auth() {
 		try {

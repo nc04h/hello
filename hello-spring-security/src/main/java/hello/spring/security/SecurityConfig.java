@@ -37,7 +37,7 @@ import hello.spring.security.social.MySocialUserDetailsService;
 import hello.spring.security.token.MyTokenAuthenticationFilter;
 import hello.spring.security.token.MyTokenAuthenticationProvider;
 
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity(debug = false)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
@@ -186,6 +186,7 @@ public class SecurityConfig {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 			SpringSocialConfigurer configurer = new SpringSocialConfigurer();
+			configurer.signupUrl("/social/signup");
 			http
 			.antMatcher("/social/twitter/**")
 			.authorizeRequests()

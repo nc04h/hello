@@ -22,6 +22,7 @@ import org.springframework.social.connect.web.SignInAdapter;
 import org.springframework.social.security.AuthenticationNameUserIdSource;
 import org.springframework.social.twitter.connect.TwitterConnectionFactory;
 
+import hello.spring.security.social.MySocialProviderSignInInterceptor;
 import hello.spring.security.social.MySocialSignInAdapter;
 
 @Configuration
@@ -75,11 +76,17 @@ public class SocialConfig extends AbstractConfig implements SocialConfigurer {
 		ProviderSignInController signInController = new ProviderSignInController(
 				connectionFactoryLocator, connectionRepository, signInAdapter());
 		signInController.setPostSignInUrl("/social/twitter/auth");
+		signInController.addSignInInterceptor(signInInterceptor());
 		return signInController;
 	}
 
 	@Bean
 	public SignInAdapter signInAdapter() {
 		return new MySocialSignInAdapter(new HttpSessionRequestCache());
+	}
+	
+	@Bean
+	public MySocialProviderSignInInterceptor signInInterceptor() {
+		return new MySocialProviderSignInInterceptor();
 	}
 }
