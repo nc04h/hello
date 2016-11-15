@@ -74,6 +74,7 @@ public class SocialConfig extends AbstractConfig implements SocialConfigurer {
 		log.debug("providerSignInController " + connectionFactoryLocator + " " + connectionRepository);
 		ProviderSignInController signInController = new ProviderSignInController(
 				connectionFactoryLocator, connectionRepository, signInAdapter());
+		signInController.setPostSignInUrl("/social/twitter/auth");
 		return signInController;
 	}
 
