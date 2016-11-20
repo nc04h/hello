@@ -1,4 +1,4 @@
-package hello.spring.security.token;
+package hello.spring.security.token.custom;
 
 import java.security.Principal;
 

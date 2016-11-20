@@ -1,4 +1,4 @@
-package hello.spring.security.token;
+package hello.spring.security.token.custom;
 
 import java.io.IOException;
 
@@ -14,6 +14,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
+
+import hello.spring.security.token.TokenConstants;
 
 public class MyTokenAuthenticationFilter extends GenericFilterBean {
 

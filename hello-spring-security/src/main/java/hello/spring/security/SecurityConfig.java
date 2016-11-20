@@ -29,11 +29,8 @@ import org.springframework.security.web.authentication.www.DigestAuthenticationF
 
 import hello.spring.security.basic.MyBasicAuthenticationProvider;
 import hello.spring.security.digest.MyDigestUserDetailsService;
-import hello.spring.security.oauth.MyOAuthAuthenticationHandler;
-import hello.spring.security.oauth.MyOAuthDetailsService;
-import hello.spring.security.oauth.MyOAuthProviderTokenServices;
-import hello.spring.security.token.MyTokenAuthenticationFilter;
-import hello.spring.security.token.MyTokenAuthenticationProvider;
+import hello.spring.security.token.custom.MyTokenAuthenticationFilter;
+import hello.spring.security.token.custom.MyTokenAuthenticationProvider;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -166,43 +163,4 @@ public class SecurityConfig {
 			auth.authenticationProvider(tokenAuthProvider);
 		}
 	}
-
-	@Configuration
-	@Order(4)
-	public static class OAuthConfig extends WebSecurityConfigurerAdapter {
-
-		public static final String REALM_NAME = "Hello OAuth";
-
-		@Autowired
-		private MyOAuthDetailsService consumerDetailsService;
-		@Autowired
-		private MyOAuthAuthenticationHandler authHandler;
-		@Autowired
-		private MyOAuthProviderTokenServices tokenServices;
-
-		private OAuthProcessingFilterEntryPoint oauthEntryPoint() {
-			OAuthProcessingFilterEntryPoint entryPoint = new OAuthProcessingFilterEntryPoint();
-			entryPoint.setRealmName(REALM_NAME);
-			return entryPoint;
-		}
-
-		@Bean
-		public ProtectedResourceProcessingFilter oauthFilter() {
-			ProtectedResourceProcessingFilter filter = new ProtectedResourceProcessingFilter();
-			filter.setAuthenticationEntryPoint(oauthEntryPoint());
-			filter.setConsumerDetailsService(consumerDetailsService);
-			filter.setAuthHandler(authHandler);
-			filter.setTokenServices(tokenServices);
-			return filter;
-		}
-
-		@Override
-		protected void configure(HttpSecurity http) throws Exception {
-			http
-			.antMatcher("/oauth/**")
-			.addFilterAfter(oauthFilter(), UsernamePasswordAuthenticationFilter.class);
-		}
-
-	}
-
 }
