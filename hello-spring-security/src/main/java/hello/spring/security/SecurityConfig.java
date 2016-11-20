@@ -1,6 +1,8 @@
 package hello.spring.security;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -12,14 +14,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.oauth.provider.OAuthProcessingFilterEntryPoint;
-import org.springframework.security.oauth.provider.filter.ProtectedResourceProcessingFilter;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
@@ -28,24 +30,43 @@ import org.springframework.security.web.authentication.www.DigestAuthenticationE
 import org.springframework.security.web.authentication.www.DigestAuthenticationFilter;
 
 import hello.spring.security.basic.MyBasicAuthenticationProvider;
+import hello.spring.security.digest.MyDigestAuthenticationProvider;
 import hello.spring.security.digest.MyDigestUserDetailsService;
 import hello.spring.security.token.custom.MyTokenAuthenticationFilter;
 import hello.spring.security.token.custom.MyTokenAuthenticationProvider;
+import hello.spring.security.token.jwt.MyJWTAuthenticationFilter;
+import hello.spring.security.token.jwt.MyJWTAuthenticationProvider;
 
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
 	private static final Logger log = Logger.getLogger(SecurityConfig.class);
 
+	@Autowired
+	private MyBasicAuthenticationProvider basicAuthProvider;
+	@Autowired
+	private MyDigestAuthenticationProvider digestAuthProvider;
+	@Autowired
+	private MyTokenAuthenticationProvider tokenAuthProvider;
+	@Autowired
+	private MyJWTAuthenticationProvider jwtAuthProvider;
+
+	@Bean
+	public AuthenticationManager authenticationManager() {
+		List<AuthenticationProvider> providers = new ArrayList<>();
+		providers.add(basicAuthProvider);
+		providers.add(digestAuthProvider);
+		return new ProviderManager(providers);
+	}
+
+
 	@Configuration
 	@Order(1)
-	public static class BasicAuthenticationConfig extends WebSecurityConfigurerAdapter {
+	public class BasicAuthenticationConfig extends WebSecurityConfigurerAdapter {
 
 		public static final String REALM_NAME = "Hello Basic Auth";
 
-		@Autowired
-		private MyBasicAuthenticationProvider basicAuthProvider;
 
 		public BasicAuthenticationEntryPoint basicAuthenticationEntryPoint() {
 			BasicAuthenticationEntryPoint entryPoint = new BasicAuthenticationEntryPoint();
@@ -64,15 +85,9 @@ public class SecurityConfig {
 		protected void configure(HttpSecurity http) throws Exception {
 			http
 			.antMatcher("/basic/**")
-			.addFilter(basicAuthenticationFilter())
+			.addFilterAfter(basicAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 			.exceptionHandling().authenticationEntryPoint(basicAuthenticationEntryPoint())
 			;
-		}
-
-		@Bean(name = "basicAuthenticationManager")
-		@Override
-		public AuthenticationManager authenticationManagerBean() throws Exception {
-			return super.authenticationManagerBean();
 		}
 
 		@Override
@@ -83,19 +98,17 @@ public class SecurityConfig {
 
 	@Configuration
 	@Order(2)
-	public static class DigestAuthenticationConfig extends WebSecurityConfigurerAdapter {
+	public class DigestAuthenticationConfig extends WebSecurityConfigurerAdapter {
 
 		public static final String REALM_NAME = "Hello Digest Auth";
-
-		@Autowired
-		private MyDigestUserDetailsService userDetailsService;
 
 		@Bean
 		public DigestAuthenticationFilter digestAuthenticationFilter() throws Exception {
 			DigestAuthenticationFilter filter = new DigestAuthenticationFilter();
 			filter.setAuthenticationEntryPoint(digestAuthenticationEntryPoint());
-			filter.setUserDetailsService(userDetailsService);
+			filter.setUserDetailsService(userDetailsService());
 			filter.setPasswordAlreadyEncoded(true);
+			filter.setCreateAuthenticatedToken(false);
 			return filter;
 		}
 
@@ -110,20 +123,28 @@ public class SecurityConfig {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 			http
-			.antMatcher("/digest/**")
-			.addFilter(digestAuthenticationFilter())
 			.exceptionHandling().authenticationEntryPoint(digestAuthenticationEntryPoint())
-			.and().csrf().disable()
+			.and()
+			.addFilter(digestAuthenticationFilter())
+			.authenticationProvider(digestAuthProvider)
+			.antMatcher("/digest/**")
+			.csrf().disable()
+			.authorizeRequests()
+			.anyRequest()
+			.authenticated()
 			;
+		}
+
+		@Bean
+		@Override
+		public MyDigestUserDetailsService userDetailsService() {
+			return new MyDigestUserDetailsService();
 		}
 	}
 
 	@Configuration
 	@Order(3)
-	public static class TokenAuthenticationConfig extends WebSecurityConfigurerAdapter {
-
-		@Autowired
-		private MyTokenAuthenticationProvider tokenAuthProvider;
+	public class TokenAuthenticationConfig extends WebSecurityConfigurerAdapter {
 
 		@Bean
 		public MyTokenAuthenticationFilter tokenAuthenticationFilter() throws Exception {
@@ -136,7 +157,7 @@ public class SecurityConfig {
 		protected void configure(HttpSecurity http) throws Exception {
 			http
 			.antMatcher("/token/**")
-			.addFilterAfter(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+			.addFilterAfter(tokenAuthenticationFilter(), DigestAuthenticationFilter.class)
 			.authenticationProvider(tokenAuthProvider)
 			.exceptionHandling().authenticationEntryPoint(tokenAuthenticationEntryPoint())
 			;
@@ -152,15 +173,38 @@ public class SecurityConfig {
 			};
 		}
 
-		@Bean(name = "tokenAuthenticationManager")
-		@Override
-		public AuthenticationManager authenticationManagerBean() throws Exception {
-			return super.authenticationManagerBean();
-		}
-
 		@Override
 		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 			auth.authenticationProvider(tokenAuthProvider);
 		}
 	}
+
+	@Configuration
+	@Order(4)
+	public class MyJWTAuthenticationConfig extends WebSecurityConfigurerAdapter {
+
+		@Bean
+		public MyJWTAuthenticationFilter jwtAuthenticationFilter() throws Exception {
+			MyJWTAuthenticationFilter filter = new MyJWTAuthenticationFilter("/jwt/**");
+			filter.setAuthenticationManager(authenticationManager());
+			return filter;
+		}
+
+
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
+			http
+			.antMatcher("/jwt/**")
+			.addFilterAfter(jwtAuthenticationFilter(), MyTokenAuthenticationFilter.class)
+			.authenticationProvider(jwtAuthProvider)
+			;
+		}
+
+		@Override
+		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+			auth.authenticationProvider(jwtAuthProvider);
+		}
+
+	}
+
 }

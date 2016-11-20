@@ -30,7 +30,7 @@ public class MyTokenAuthenticationFilter extends GenericFilterBean {
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) res;
 
-		String token = request.getHeader(TokenConstants.TOKEN_HEADER);
+		String token = request.getHeader(TokenConstants.CUSTOM_TOKEN_HEADER);
 		log.debug("token=" + token);
 		log.debug("request=" + request.getRequestURI());
 
