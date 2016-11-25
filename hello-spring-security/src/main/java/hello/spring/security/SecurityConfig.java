@@ -21,8 +21,11 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -37,7 +40,7 @@ import hello.spring.security.token.custom.MyTokenAuthenticationProvider;
 import hello.spring.security.token.jwt.MyJWTAuthenticationFilter;
 import hello.spring.security.token.jwt.MyJWTAuthenticationProvider;
 
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity(debug = false)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
@@ -187,6 +190,17 @@ public class SecurityConfig {
 		public MyJWTAuthenticationFilter jwtAuthenticationFilter() throws Exception {
 			MyJWTAuthenticationFilter filter = new MyJWTAuthenticationFilter("/jwt/**");
 			filter.setAuthenticationManager(authenticationManager());
+			AuthenticationSuccessHandler successHandler = new AuthenticationSuccessHandler() {
+
+				@Override
+				public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+						Authentication authentication) throws IOException, ServletException {
+					SecurityContextHolder.getContext().setAuthentication(authentication);
+					log.debug("onAuthenticationSuccess authentication=" + authentication);
+				}
+				
+			};
+			filter.setAuthenticationSuccessHandler(successHandler);
 			return filter;
 		}
 
@@ -195,8 +209,11 @@ public class SecurityConfig {
 		protected void configure(HttpSecurity http) throws Exception {
 			http
 			.antMatcher("/jwt/**")
-			.addFilterAfter(jwtAuthenticationFilter(), MyTokenAuthenticationFilter.class)
+			.addFilterAfter(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 			.authenticationProvider(jwtAuthProvider)
+			.authorizeRequests()
+			.anyRequest()
+			.authenticated()
 			;
 		}
 

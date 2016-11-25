@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import hello.spring.security.data.User;
 import hello.spring.security.data.UserToken;
+import hello.spring.security.service.JWTService;
 import hello.spring.security.service.UserService;
 import hello.spring.security.service.UserTokenService;
 
@@ -27,6 +28,8 @@ public class MyDigestAuthController {
 	private UserService userService;
 	@Autowired
 	private UserTokenService userTokenService;
+	@Autowired
+	private JWTService jwtService;
 
 	@PreAuthorize("hasRole('ROLE_DIGEST_USER')")
 	@RequestMapping(path = "/auth", method = RequestMethod.GET)
@@ -54,4 +57,16 @@ public class MyDigestAuthController {
 		return token.getToken();
 	}
 
+	@PreAuthorize("hasRole('ROLE_TOKEN_USER')")
+	@RequestMapping(path = "/jwt", method = RequestMethod.PUT)
+	public @ResponseBody String jwt(Principal principal) {
+		log.debug("---> jwt");
+		log.debug("principal=" + principal);
+		log.debug(((UsernamePasswordAuthenticationToken) principal).getPrincipal());
+		log.debug(((UsernamePasswordAuthenticationToken) principal).getCredentials());
+		User user = userService.findByLogin(principal.getName());
+		String token = jwtService.getToken(user.getLogin(), user.getMd5Password());
+		log.debug("token=" + token);
+		return token;
+	}
 }

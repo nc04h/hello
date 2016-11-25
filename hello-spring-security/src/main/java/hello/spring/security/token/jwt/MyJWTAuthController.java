@@ -3,6 +3,7 @@ package hello.spring.security.token.jwt;
 import java.security.Principal;
 
 import org.apache.log4j.Logger;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,7 @@ public class MyJWTAuthController {
 
 	private static final Logger log = Logger.getLogger(MyJWTAuthController.class);
 
+	@PreAuthorize("hasRole('ROLE_TOKEN_USER')")
 	@RequestMapping("/auth")
 	public @ResponseBody String auth(Principal principal) {
 		try {
