@@ -22,7 +22,7 @@ public class MyTokenAuthController {
 			log.debug("---> auth");
 			log.debug("principal=" + principal);
 			log.debug(SecurityContextHolder.getContext().getAuthentication());
-			return "index";
+			return "token index";
 		} finally {
 			log.debug("<--- auth");
 		}

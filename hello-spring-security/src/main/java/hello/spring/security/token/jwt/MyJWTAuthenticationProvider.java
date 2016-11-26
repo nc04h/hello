@@ -36,6 +36,8 @@ public class MyJWTAuthenticationProvider implements AuthenticationProvider {
 	private MyJWTAuthentication validateAuthentication(MyJWTAuthentication authentication) {
 		log.debug("validateAuthentication");
 		String token = authentication.getToken();
-		return jwtService.validateToken(token);
+		MyJWTAuthentication result = jwtService.validateToken(token);
+		result.setAuthenticated(true);
+		return result;
 	}
 }

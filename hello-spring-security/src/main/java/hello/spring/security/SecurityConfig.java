@@ -21,11 +21,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -86,6 +83,7 @@ public class SecurityConfig {
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
+			log.debug("configure basic auth");
 			http
 			.antMatcher("/basic/**")
 			.addFilterAfter(basicAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
@@ -125,6 +123,7 @@ public class SecurityConfig {
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
+			log.debug("configure digest auth");
 			http
 			.exceptionHandling().authenticationEntryPoint(digestAuthenticationEntryPoint())
 			.and()
@@ -158,6 +157,7 @@ public class SecurityConfig {
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
+			log.debug("configure token auth");
 			http
 			.antMatcher("/token/**")
 			.addFilterAfter(tokenAuthenticationFilter(), DigestAuthenticationFilter.class)
@@ -188,25 +188,14 @@ public class SecurityConfig {
 
 		@Bean
 		public MyJWTAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-			MyJWTAuthenticationFilter filter = new MyJWTAuthenticationFilter("/jwt/**");
+			MyJWTAuthenticationFilter filter = new MyJWTAuthenticationFilter();
 			filter.setAuthenticationManager(authenticationManager());
-			AuthenticationSuccessHandler successHandler = new AuthenticationSuccessHandler() {
-
-				@Override
-				public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-						Authentication authentication) throws IOException, ServletException {
-					SecurityContextHolder.getContext().setAuthentication(authentication);
-					log.debug("onAuthenticationSuccess authentication=" + authentication);
-				}
-				
-			};
-			filter.setAuthenticationSuccessHandler(successHandler);
 			return filter;
 		}
 
-
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
+			log.debug("configure jwt auth");
 			http
 			.antMatcher("/jwt/**")
 			.addFilterAfter(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
@@ -221,7 +210,6 @@ public class SecurityConfig {
 		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 			auth.authenticationProvider(jwtAuthProvider);
 		}
-
 	}
 
 }

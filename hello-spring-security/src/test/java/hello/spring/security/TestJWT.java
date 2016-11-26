@@ -29,7 +29,7 @@ public class TestJWT extends TestAbstract {
 			HttpHeaders headers = new HttpHeaders();
 			HttpEntity<?> entity = new HttpEntity<Object>(headers);
 			token = restTemplate.exchange(url, HttpMethod.PUT, entity, String.class).getBody();
-			log.debug(token);
+			log.debug("---> token=" + token);
 		}
 		Assert.hasText(token);
 		{

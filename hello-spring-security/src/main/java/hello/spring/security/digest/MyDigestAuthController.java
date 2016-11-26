@@ -36,7 +36,7 @@ public class MyDigestAuthController {
 	public @ResponseBody String auth() {
 		try {
 			log.debug("---> auth");
-			return "index";
+			return "digest index";
 		} finally {
 			log.debug("<--- auth");
 		}

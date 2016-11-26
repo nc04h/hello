@@ -22,7 +22,7 @@ public class MyJWTAuthController {
 			log.debug("---> auth");
 			log.debug("principal=" + principal);
 			log.debug(SecurityContextHolder.getContext().getAuthentication());
-			return "index";
+			return "jwt index";
 		} finally {
 			log.debug("<--- auth");
 		}

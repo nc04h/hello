@@ -17,7 +17,7 @@ public class MyBasicAuthController {
 	public @ResponseBody String auth() {
 		try {
 			log.debug("---> auth");
-			return "index";
+			return "basic index";
 		} finally {
 			log.debug("<--- auth");
 		}

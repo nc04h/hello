@@ -19,17 +19,32 @@ public class TestToken extends TestAbstract {
 
 	@Test
 	public void testTokenAuth() {
-		String url = "http://localhost:1234/token/auth";
+		String token = null;
 		final HttpHost host = new HttpHost("localhost", 1234);
-		HttpClient httpClient = httpClient(host);
-		RestTemplate restTemplate = new RestTemplate(new TestRequestFactory(httpClient, host));
-		HttpHeaders headers = new HttpHeaders();
-		headers.add(TokenConstants.CUSTOM_TOKEN_HEADER, "ryzBLEZ3b2D5G80lyGXJabYd7C/YZal41bb+ZDHvuteHS2/O3BJQA2KznpiyQIUhYED5Hr+axNY1QoIqBNErdg==");
-		HttpEntity<?> entity = new HttpEntity<Object>(headers);
-		String response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class).getBody();
-		log.debug(response);
+		{
+			String url = "http://localhost:1234/digest/token";
+			String login = "token";
+			String password = "auth";
+			HttpClient httpClient = httpClient(login, password, host);
+			RestTemplate restTemplate = new RestTemplate(new TestRequestFactory(httpClient, host));
+			HttpHeaders headers = new HttpHeaders();
+			HttpEntity<?> entity = new HttpEntity<Object>(headers);
+			token = restTemplate.exchange(url, HttpMethod.PUT, entity, String.class).getBody();
+			log.debug(token);
+		}
+		Assert.hasText(token);
+		{
+			String url = "http://localhost:1234/token/auth";
+			HttpClient httpClient = httpClient(host);
+			RestTemplate restTemplate = new RestTemplate(new TestRequestFactory(httpClient, host));
+			HttpHeaders headers = new HttpHeaders();
+			headers.add(TokenConstants.CUSTOM_TOKEN_HEADER, token);
+			HttpEntity<?> entity = new HttpEntity<Object>(headers);
+			String response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class).getBody();
+			log.debug(response);
+		}
 	}
-	
+
 	@Test
 	public void testWrongTokenAuth() {
 		try {
