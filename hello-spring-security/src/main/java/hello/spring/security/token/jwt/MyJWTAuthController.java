@@ -26,8 +26,12 @@ public class MyJWTAuthController {
 		} finally {
 			log.debug("<--- auth");
 		}
-
 	}
 
+	@PreAuthorize("hasRole('ROLE_TOKEN_USER')")
+	@RequestMapping("/test")
+	public @ResponseBody String test() {
+		return "jwt test";
+	}
 
 }
