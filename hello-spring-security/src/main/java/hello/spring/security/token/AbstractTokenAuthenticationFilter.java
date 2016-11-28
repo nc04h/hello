@@ -60,6 +60,6 @@ public abstract class AbstractTokenAuthenticationFilter extends GenericFilterBea
 			return true;
 		}
 		log.debug("isAuthenticated: " + auth.isAuthenticated());
-		return false;
+		return true;
 	}
 }
