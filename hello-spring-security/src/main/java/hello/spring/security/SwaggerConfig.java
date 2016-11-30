@@ -15,6 +15,7 @@ import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.ApiKey;
 import springfox.documentation.service.AuthorizationScope;
+import springfox.documentation.service.BasicAuth;
 import springfox.documentation.service.SecurityReference;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
@@ -77,9 +78,26 @@ public class SwaggerConfig {
 				.paths(PathSelectors.any())
 				.build()
 				.pathMapping("/")
-				.apiInfo(apiInfo());
+				.apiInfo(apiInfo())
+				;
 	}
-	
+
+	@Bean
+	public Docket basic() {
+		return new Docket(DocumentationType.SWAGGER_2)
+				.groupName("basic")
+				.select()
+				.apis(RequestHandlerSelectors.basePackage("hello.spring.security.basic"))
+				.paths(PathSelectors.any())
+				.build()
+				.pathMapping("/")
+				.apiInfo(apiInfo())
+				.securityContexts(Arrays.asList(securityContext()))
+				.securitySchemes(Arrays.asList(
+						new BasicAuth("basicAuth")))
+				;
+	}
+
 	private ApiInfo apiInfo() {
 		return new ApiInfoBuilder().title("Test API").version("1.0").build();
 	}
@@ -100,7 +118,8 @@ public class SwaggerConfig {
 		AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
 		authorizationScopes[0] = authorizationScope;
 		return Arrays.asList(new SecurityReference("customKey", authorizationScopes), 
-				new SecurityReference("jwtKey", authorizationScopes));
+				new SecurityReference("jwtKey", authorizationScopes), 
+				new SecurityReference("basicAuth", authorizationScopes));
 	}
 
 }
