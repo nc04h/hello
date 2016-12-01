@@ -19,6 +19,7 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.AuthenticationException;
@@ -60,10 +61,23 @@ public class SecurityConfig {
 		return new ProviderManager(providers);
 	}
 
+	private static abstract class AbstractSecurityConfig extends WebSecurityConfigurerAdapter {
+
+		@Override
+		public void configure(WebSecurity web) throws Exception {
+			web.ignoring().antMatchers(
+					"/",
+					"/index.html", 
+					"/css/**",
+					"/scripts/**", 
+					"/modules/**");
+		}
+	}
+
 
 	@Configuration
 	@Order(1)
-	public class BasicAuthenticationConfig extends WebSecurityConfigurerAdapter {
+	public class BasicAuthenticationConfig extends AbstractSecurityConfig {
 
 		public static final String REALM_NAME = "Hello Basic Auth";
 
@@ -86,6 +100,7 @@ public class SecurityConfig {
 			log.debug("configure basic auth");
 			http
 			.antMatcher("/basic/**")
+			.csrf().disable()
 			.addFilterAfter(basicAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 			.exceptionHandling().authenticationEntryPoint(basicAuthenticationEntryPoint())
 			;
@@ -99,7 +114,7 @@ public class SecurityConfig {
 
 	@Configuration
 	@Order(2)
-	public class DigestAuthenticationConfig extends WebSecurityConfigurerAdapter {
+	public class DigestAuthenticationConfig extends AbstractSecurityConfig {
 
 		public static final String REALM_NAME = "Hello Digest Auth";
 
@@ -146,7 +161,7 @@ public class SecurityConfig {
 
 	@Configuration
 	@Order(3)
-	public class TokenAuthenticationConfig extends WebSecurityConfigurerAdapter {
+	public class TokenAuthenticationConfig extends AbstractSecurityConfig {
 
 		@Bean
 		public MyTokenAuthenticationFilter tokenAuthenticationFilter() throws Exception {
@@ -184,7 +199,7 @@ public class SecurityConfig {
 
 	@Configuration
 	@Order(4)
-	public class MyJWTAuthenticationConfig extends WebSecurityConfigurerAdapter {
+	public class MyJWTAuthenticationConfig extends AbstractSecurityConfig {
 
 		@Bean
 		public MyJWTAuthenticationFilter jwtAuthenticationFilter() throws Exception {

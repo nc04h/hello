@@ -1,0 +1,43 @@
+<!doctype html>
+<html ng-app="Demo">
+<head>
+<title>Hello AngularJS</title>
+<script src="scripts/angular.min.js"></script>
+<script src="scripts/angular-cookies.min.js"></script>
+<script src="scripts/angular-route.min.js"></script>
+<script src="scripts/angular-animate.min.js"></script>
+<script src="scripts/angular-aria.min.js"></script>
+<script src="scripts/angular-messages.min.js"></script>
+<script src="scripts/angular-material.min.js"></script>
+<script src="scripts/hello.js"></script>
+<script src="modules/authentication/services.js"></script>
+<script src="modules/authentication/controllers.js"></script>
+<script src="modules/home/controllers.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="/css/angular-material.min.css" />
+<link rel="stylesheet" type="text/css" href="/css/hello.css" />
+</head>
+
+<body>
+
+	<div ng-controller="AppCtrl" ng-cloak="">
+		<md-content class="md-padding"> <md-nav-bar
+			md-selected-nav-item="currentNavItem"
+			nav-bar-aria-label="navigation links"> <md-nav-item
+			md-nav-href="#/basic/login" name="basic">Basic</md-nav-item> <md-nav-item
+			md-nav-href="#/digest/login" name="digest">Digest</md-nav-item> <md-nav-item
+			md-nav-href="#/token/login" name="token">Token</md-nav-item> </md-nav-bar>
+
+		<div class="ext-content">
+			<div class="container">
+				<div class="col-xs-offset-2 col-xs-8">
+					<div ng-view></div>
+				</div>
+			</div>
+
+		</div>
+		</md-content>
+	</div>
+</body>
+</html>
